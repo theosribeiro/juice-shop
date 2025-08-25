@@ -1,3 +1,4 @@
+#Arquivo de configuracao do pipeline Circle CI
 # Versao do Circle CI
 version: 2.1
 
