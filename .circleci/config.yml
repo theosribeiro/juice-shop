@@ -9,7 +9,7 @@ orbs:
 jobs:
   build: 
     docker:
-      - image: cimg/node:18.17.0
+      - image: cimg/node:22.18.0
     steps:
       - checkout
       - run: 
@@ -31,7 +31,7 @@ jobs:
           
   test:
     docker:
-      - image: cimg/node:19.6.1-browsers
+      - image: cimg/node:22.18.0-browsers
     steps:
       - attach_workspace:
           at: .
