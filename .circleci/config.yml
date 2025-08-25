@@ -87,14 +87,14 @@ jobs:
             aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
 
 
-  workflows:
-    version: 2
-    build_test_deploy:
-      jobs:
-        - build
-        - test:
-            requires:
-              - build
-        - deploy:
-            requires:
-              - test
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
