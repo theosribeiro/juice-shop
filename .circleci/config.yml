@@ -12,10 +12,18 @@ jobs:
       - image: cimg/node:19.6.1
     steps:
       - checkout
-      - run: sudo npm install -g @angular/cli
-      - run: sudo npm install -g grunt-cli
-      - run: npm install
-      - run: ls -la
+      - run: 
+          name: "Instalar angular"
+          command: sudo npm install -g @angular/cli
+      - run: 
+          name: "Instalar grunt"
+          command: sudo npm install -g grunt-cli
+      - run: 
+          name: "Instalar dependencias"
+          command: npm install
+      - run: 
+          name: "Listar Arquivos"
+          command: ls -la
       - persist_to_workspace:
           root: .
           paths:
@@ -28,10 +36,18 @@ jobs:
       - attach_workspace:
           at: .
       - browser-tools/install-browser-tools
-      - run: ls -la
-      - run: sudo npm install -g @angular/cli
-      - run: sudo npm install -g grunt-cli
-      - run: npm run test
+      - run: 
+          name: "Listar arquivos"
+          command: ls -la
+      - run: 
+          name: "Instalar Angular CLI"
+          command: sudo npm install -g @angular/cli
+      - run: 
+          name: "Instalar Grunt CLI"
+          command: sudo npm install -g grunt-cli
+      - run: 
+          name: "Rodar testes"
+          command: npm run test
 
   deploy:
     docker:
@@ -48,19 +64,27 @@ jobs:
           profile-name: default
 
       # BUILD A IMAGEM DOCKER E PUBLICAR NO DOCKER HUB
-      - run: docker build -t $DOCKERHUB_USERNAME/juice-shop:$CIRCLE_SHA1 -t $DOCKERHUB_USERNAME/juice-shop:latest ./
-      - run: echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
-      - run: docker push $DOCKERHUB_USERNAME/juice-shop:$CIRCLE_SHA1
-      - run: docker push $DOCKERHUB_USERNAME/juice-shop:latest
+      - run:  
+          name: "Build e Push da imagem Docker no Docker Hub"
+          command: docker build -t $DOCKERHUB_USERNAME/juice-shop:$CIRCLE_SHA1 -t $DOCKERHUB_USERNAME/juice-shop:latest ./
+      - run: 
+          name: "Login no Docker Hub"
+          command: echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+      - run: 
+          name: "Push da imagem Docker no Docker Hub"
+          command: docker push $DOCKERHUB_USERNAME/juice-shop:$CIRCLE_SHA1
+      - run: 
+          name: "Push da imagem Docker com a tag latest no Docker Hub"
+          command: docker push $DOCKERHUB_USERNAME/juice-shop:latest
 
       # ATUALIZAR A APLICACAO NO AWS ELASTIC BEANSTALK
       - run:
-        name: "Deploy no AWS Elastic Beanstalk"
-        command: |
-          aws configure set region sa-east-1
-          aws s3 cp ebs-app-options.json s3://juice-shop-tr-env-prod
-          aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options.json"
-          aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
+          name: "Deploy no AWS Elastic Beanstalk"
+          command: |
+            aws configure set region sa-east-1
+            aws s3 cp ebs-app-options.json s3://juice-shop-tr-env-prod
+            aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options.json"
+            aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
 
 
   workflows:
