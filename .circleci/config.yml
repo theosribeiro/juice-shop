@@ -9,7 +9,7 @@ orbs:
 jobs:
   build: 
     docker:
-      - image: cimg/node:19.6.1
+      - image: cimg/node:18.17.0
     steps:
       - checkout
       - run: 
