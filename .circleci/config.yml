@@ -36,11 +36,19 @@ jobs:
       - attach_workspace:
           at: .
       - run: 
-          name: "Atualizar pacotes"
-          command: sudo apt-get update
+          name: "Adicionar repositorio do Mozilla Team"
+          command: |
+            sudo add-apt-repository -y ppa:mozillateam/ppa -y
+            echo '
+            Package: firefox*
+            Pin: release o=LP-PPA-mozillateam
+            Pin-Priority: 501
+            ' | sudo tee /etc/apt/preferences.d/mozilla-firefox
       - run: 
-          name: "Instalar Firefox ESR"
-          command: sudo apt-get install -y firefox-esr
+          name: "Instalar Firefox"
+          command: | 
+            sudo apt-get update
+            sudo apt-get install -y firefox
       - run: 
           name: "Verificar versao do Firefox"
           command: firefox --version
