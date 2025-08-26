@@ -36,6 +36,12 @@ jobs:
       - attach_workspace:
           at: .
       - run: 
+          name: "Atualizar pacotes"
+          command: sudo apt-get update
+      - run: 
+          name: "Instalar Firefox ESR"
+          command: sudo apt-get install -y firefox-esr
+      - run: 
           name: "Verificar versao do Firefox"
           command: firefox --version
       - run: 
