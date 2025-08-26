@@ -35,8 +35,9 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - browser-tools/install-browser-tools:
-          firefox-version: "141.0"
+      - run: 
+          name: "Verificar versao do Firefox"
+          command: firefox --version
       - run: 
           name: "Listar arquivos"
           command: ls -la
