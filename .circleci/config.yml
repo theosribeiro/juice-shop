@@ -5,6 +5,7 @@ version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.3.0
   aws-cli: circleci/aws-cli@3.1.4
+  # synk: snyk/snyk@1.4.0
 
 jobs:
   build: 
@@ -77,6 +78,35 @@ jobs:
           name: "Rodar testes"
           command: npm run test
 
+  # Executar o Software Composition Analysis (SCA) com Snyk
+  # test_sca:
+  #   # Variaveis para integrar com DefectDojo
+  #   environment:
+  #     APP_NAME: "Juice Shop"
+  #     DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
+  #     SCAN_TYPE: "Snyk Scan"
+  #     REPORT_FILE: "snyk-report.json"
+
+  #   docker:
+  #     - image: cimg/node:22.18.0
+    
+  #   steps:
+  #     -attach_workspace:
+  #         at: .
+  #     snyk/scan:
+  #       # Falha o build caso vulnerabilidades criticas sejam encontradas
+  #       fail-on-issues: true
+  #       # Falha se encontrar vulnerabilidades de severidade alta ou maior
+  #       severity-threshold: high
+  #       # Tirar omagem instatanea das dependencias atuais da aplicacao para monitoramento continuo pelo synk
+  #       monitor-on-build: true
+  #       # Define o nome do projeto para scan
+  #       project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}'
+  #       # Nome da variavel do ambiente usada para armazenar o token de auth do Snyk
+  #       token-variable: SNYK_TOKEN
+  #       # Argumentos adicionais da CLI do Snyk(https://docs.snyk.io/snyk-cli/reference)
+  #       additional-arguments: "--json-file-output=${REPORT_FILE}"
+
   deploy:
     docker:
       - image: cimg/base:2022.09
@@ -107,11 +137,16 @@ jobs:
 
       # ATUALIZAR A APLICACAO NO AWS ELASTIC BEANSTALK
       - run:
+          name: "Instalar AWS CLI"
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
+      - run:
           name: "Deploy no AWS Elastic Beanstalk"
           command: |
             aws configure set region sa-east-1
-            aws s3 cp ebs-app-options.json s3://juice-shop-tr-env-prod
-            aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options.json"
+            aws s3 cp ebs-app-options.json s3://juice-shop-tr-env-prod/ebs-app-options-$CIRCLE_SHA1.json
+            aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options-$CIRCLE_SHA1.json"
             aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
 
 
