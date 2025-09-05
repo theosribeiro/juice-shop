@@ -80,32 +80,41 @@ jobs:
 
   # Executar o Software Composition Analysis (SCA) com Snyk
   test_sca:
+
+		docker:
+      - image: cimg/node:22.18.0
+
+
     # Variaveis para integrar com DefectDojo
     environment:
-      APP_NAME: "Juice Shop"
-      DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
-      SCAN_TYPE: "Snyk Scan"
-      REPORT_FILE: "snyk-report.json"
-
-    docker:
-      - image: cimg/node:22.18.0
+      # APP_NAME: "Juice Shop"
+      # DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
+      # SCAN_TYPE: "Snyk Scan"
+      # REPORT_FILE: "snyk-report.json"
+			SNYK_TOKEN: $SNYK_TOKEN
     
     steps:
       - attach_workspace:
           at: .
-      - snyk/scan:
-          # Falha o build caso vulnerabilidades criticas sejam encontradas
-          fail-on-issues: true
-          # Falha se encontrar vulnerabilidades de severidade alta ou maior
-          severity-threshold: high
-          # Tirar omagem instatanea das dependencias atuais da aplicacao para monitoramento continuo pelo synk
-          monitor-on-build: true
-          # Define o nome do projeto para scan
-          project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}'
-          # Nome da variavel do ambiente usada para armazenar o token de auth do Snyk
-          token-variable: SNYK_TOKEN
-          # Argumentos adicionais da CLI do Snyk(https://docs.snyk.io/snyk-cli/reference)
-          additional-arguments: "--json-file-output=snyk-report.json"
+			- run:
+					name: "Instalar Snyk CLI"
+					command: npm install -g snyk
+			- run:
+					name: "Rodar Snyk Scan"
+					command: snyk test --severity-threshold=high --json-file-output=snyk-report.json
+      # - snyk/scan:
+      #     # Falha o build caso vulnerabilidades criticas sejam encontradas
+      #     fail-on-issues: true
+      #     # Falha se encontrar vulnerabilidades de severidade alta ou maior
+      #     severity-threshold: high
+      #     # Tirar omagem instatanea das dependencias atuais da aplicacao para monitoramento continuo pelo synk
+      #     monitor-on-build: true
+      #     # Define o nome do projeto para scan
+      #     project: '${CIRCLE_PROJECT_REPONAME}/${CIRCLE_BRANCH}'
+      #     # Nome da variavel do ambiente usada para armazenar o token de auth do Snyk
+      #     token-variable: SNYK_TOKEN
+      #     # Argumentos adicionais da CLI do Snyk(https://docs.snyk.io/snyk-cli/reference)
+      #     additional-arguments: "--json-file-output=snyk-report.json"
 
   deploy-branch-1:
     docker:
