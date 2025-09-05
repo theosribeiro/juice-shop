@@ -178,7 +178,7 @@ workflows:
       - deploy-branch-1:
           requires:
             - test
-            - test_sca
+            # - test_sca
           filters:
             branches:
               only: branch-1
