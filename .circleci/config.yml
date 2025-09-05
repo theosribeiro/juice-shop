@@ -94,14 +94,14 @@ jobs:
       - attach_workspace:
         at: .
       - run:
-        name: "Instalar Snyk CLI"
-        command: npm install -g snyk
+          name: "Instalar Snyk CLI"
+          command: npm install -g snyk
       - run:
-        name: "Rodar Snyk Test"
-        command: snyk test --severity-threshold=high --json-file-output=${REPORT_FILE}
+          name: "Rodar Snyk Test"
+          command: snyk test --severity-threshold=high --json-file-output=${REPORT_FILE}
       - run:
-        name: "Rodar Snyk Monitor"
-        command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}
+          name: "Rodar Snyk Monitor"
+          command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}
       # - snyk/scan:
       #     # Falha o build caso vulnerabilidades criticas sejam encontradas
       #     fail-on-issues: true
