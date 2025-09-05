@@ -80,18 +80,15 @@ jobs:
 
   # Executar o Software Composition Analysis (SCA) com Snyk
   test_sca:
-
 		docker:
       - image: cimg/node:22.18.0
-
-
-    # Variaveis para integrar com DefectDojo
+    
+		# Variaveis para integrar com DefectDojo
     environment:
-      # APP_NAME: "Juice Shop"
-      # DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
-      # SCAN_TYPE: "Snyk Scan"
-      # REPORT_FILE: "snyk-report.json"
-			SNYK_TOKEN: $SNYK_TOKEN
+      APP_NAME: "Juice Shop"
+      DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
+      SCAN_TYPE: "Snyk Scan"
+      REPORT_FILE: "snyk-report.json"
     
     steps:
       - attach_workspace:
@@ -100,8 +97,11 @@ jobs:
 					name: "Instalar Snyk CLI"
 					command: npm install -g snyk
 			- run:
-					name: "Rodar Snyk Scan"
-					command: snyk test --severity-threshold=high --json-file-output=snyk-report.json
+					name: "Rodar Snyk Test"
+					command: snyk test --severity-threshold=high --json-file-output=${REPORT_FILE}
+			- run:
+					name: "Rodar Snyk Monitor"
+					command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}
       # - snyk/scan:
       #     # Falha o build caso vulnerabilidades criticas sejam encontradas
       #     fail-on-issues: true
