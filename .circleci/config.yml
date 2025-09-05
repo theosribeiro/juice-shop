@@ -163,13 +163,13 @@ workflows:
       #     filters:
       #       branches:
       #         only: staging
-      - deploy-prod:
-          requires:
-            - test
-            - test_sca
-          filters:
-            branches:
-              only: master
+      # - deploy-prod:
+      #     requires:
+      #       - test
+      #       - test_sca
+      #     filters:
+      #       branches:
+      #         only: master
       - deploy-branch-1:
           requires:
             - test
