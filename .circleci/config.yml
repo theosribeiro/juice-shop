@@ -83,7 +83,7 @@ jobs:
     docker:
       - image: cimg/node:22.18.0
     
-		# Variaveis para integrar com DefectDojo
+    # Variaveis para integrar com DefectDojo
     environment:
       APP_NAME: "Juice Shop"
       DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
