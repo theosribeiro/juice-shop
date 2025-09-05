@@ -97,7 +97,7 @@ jobs:
           command: npm install -g snyk
       - run:
           name: "Rodar Snyk Test"
-          command: snyk test --severity-threshold=high --json-file-output=${REPORT_FILE} || true
+          command: snyk test --severity-threshold=high --json-file-output=snyk-report.json || true
       - run:
           name: "Rodar Snyk Monitor"
           command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH} || true
@@ -163,13 +163,13 @@ workflows:
       #     filters:
       #       branches:
       #         only: staging
-      # - deploy-prod:
-      #     requires:
-      #       - test
-      #       - test_sca
-      #     filters:
-      #       branches:
-      #         only: master
+      - deploy-prod:
+          requires:
+            - test
+            - test_sca
+          filters:
+            branches:
+              only: master
       - deploy-branch-1:
           requires:
             - test
