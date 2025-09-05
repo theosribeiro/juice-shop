@@ -5,7 +5,7 @@ version: 2.1
 orbs:
   browser-tools: circleci/browser-tools@1.3.0
   aws-cli: circleci/aws-cli@3.1.4
-  synk: snyk/snyk@1.4.0
+  # synk: snyk/snyk@1.4.0
 
 jobs:
   build: 
@@ -80,7 +80,7 @@ jobs:
 
   # Executar o Software Composition Analysis (SCA) com Snyk
   test_sca:
-		docker:
+    docker:
       - image: cimg/node:22.18.0
     
 		# Variaveis para integrar com DefectDojo
@@ -92,16 +92,16 @@ jobs:
     
     steps:
       - attach_workspace:
-          at: .
-			- run:
-					name: "Instalar Snyk CLI"
-					command: npm install -g snyk
-			- run:
-					name: "Rodar Snyk Test"
-					command: snyk test --severity-threshold=high --json-file-output=${REPORT_FILE}
-			- run:
-					name: "Rodar Snyk Monitor"
-					command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}
+        at: .
+      - run:
+        name: "Instalar Snyk CLI"
+        command: npm install -g snyk
+      - run:
+        name: "Rodar Snyk Test"
+        command: snyk test --severity-threshold=high --json-file-output=${REPORT_FILE}
+      - run:
+        name: "Rodar Snyk Monitor"
+        command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH}
       # - snyk/scan:
       #     # Falha o build caso vulnerabilidades criticas sejam encontradas
       #     fail-on-issues: true
