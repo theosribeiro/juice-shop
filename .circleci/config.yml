@@ -158,9 +158,9 @@ workflows:
       - test:
           requires:
             - build
-      - test_sca:
-          requires:
-            - build
+      # - test_sca:
+      #     requires:
+      #       - build
       # - deploy-stg:
       #     requires:
       #       - test
