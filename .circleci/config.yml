@@ -242,23 +242,23 @@ workflows:
           requires:
             - build
       - test_secrets_scanning:
-        requires:
-          - build
+          requires:
+            - build
         filters:
           branches:
             only: master
       - pr_test_secrets_scanning:
-        requires:
-          - build
-        filters:
-          branches:
-            ignore: master
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: master
       - test_sast:
-        requires:
-          - build
-        filters:
-          branches:
-            ignore: master
+          requires:
+            - build
+          filters:
+            branches:
+              ignore: master
           
       # - deploy-stg:
       #     requires:
