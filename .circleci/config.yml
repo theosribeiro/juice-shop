@@ -258,6 +258,12 @@ workflows:
             - build
           filters:
             branches:
+              only: master
+      - pr_test_sast:
+          requires:
+            - build
+          filters:
+            branches:
               ignore: master
           
       # - deploy-stg:
