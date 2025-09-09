@@ -102,6 +102,91 @@ jobs:
           name: "Rodar Snyk Monitor"
           command: snyk monitor --project-name=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_BRANCH} || true
 
+  # Configurar Semgrep para analizar somente as modificações em stand-alone mode
+  #pr = pull request
+  pr_test_sast:
+    environment:
+      SEMGREP_RULES: p/default
+      # Define a branch de base para comparar as modificações
+      SEMGREP_BASELINE_REF: origin/master
+
+    docker:
+      - image: returntocorp/semgrep
+    
+    steps:
+      - checkout
+      - run:
+          name: "Semgrep scan"
+          command: semgrep ci
+  
+  # Configurar Semgrep para enviar o resultado completo do scan para semgrep.dev
+  # Executa analise estatica completa de codigo
+  test_sast:
+    environment:
+      SEMGREP_RULES: p/default
+      APP_NAME: "Juice Shop"
+      DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
+      SCAN_TYPE: "Semgrep JSON Report"
+      REPORT_FILE: "semgrep-report.json"
+
+    docker:
+      - image: returntocorp/semgrep
+
+    steps:
+      - checkout
+      - run:
+          name: "Instalar curl e jq"
+          command: apk update && apk add curl jq
+      - run:
+          name: "Semgrep scan"
+          # Roda o semgrep falhando o pipeline caso encontre problemas
+          # command: semgrep ci --json -o semgrep-report.json
+          # Roda o semgrep sem falhar o pipeline caso encontre problemas
+          command: semgrep ci --json -o semgrep-report.json || true
+
+  # Executar o secets scanning no repotirorio considerando apenas as modificacoes pela branch atual
+  pr_test_secrets_scanning:
+    docker:
+      - image: trufflesecurity/trufflehog:latest
+    
+    environment:
+      APP_NAME: "Juice Shop"
+      DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
+      SCAN_TYPE: "TruffleHog Secrets Scan"
+      REPORT_FILE: "trufflehog-report.json"
+
+    steps:
+      - checkout
+      # Dependencias para enviar o relatorio para o Defect Dojo
+      - run:
+          name: "Instalar curl e jq"
+          command: apk update && apk add curl jq
+      - run:
+          name: "Secrets Scanning"
+          command: trufflehog git file://. --fail --since-commit master --branch "$CIRCLE_BRANCH" -j | tee -a trufflehog-report.json | jq
+
+  test_secrets_scanning:
+    docker:
+      - image: trufflesecurity/trufflehog:latest
+    
+    environment:
+      APP_NAME: "Juice Shop"
+      DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan/"
+      SCAN_TYPE: "TruffleHog Secrets Scan"
+      REPORT_FILE: "trufflehog-report.json"
+
+    steps:
+      - checkout
+      # Dependencias para enviar o relatorio para o Defect Dojo
+      - run:
+          name: "Instalar curl e jq"
+          command: apk update && apk add curl jq
+      - run:
+          name: "Secrets Scanning"
+          # Somente falhar se conseguir verificar as credenciais (Se conseguir conexao por meio das credenciais)
+          command: trufflehog git file://. --fail --only-verified -j | tee -a trufflehog-report.json | jq
+
+
   deploy-branch-1:
     docker:
       - image: cimg/base:2022.09
@@ -156,10 +241,31 @@ workflows:
       - test_sca:
           requires:
             - build
+      - test_secrets_scanning:
+        requires:
+          - build
+        filters:
+          branches:
+            only: master
+      - pr_test_secrets_scanning:
+        requires:
+          - build
+        filters:
+          branches:
+            ignore: master
+      - test_sast:
+        requires:
+          - build
+        filters:
+          branches:
+            ignore: master
+          
       # - deploy-stg:
       #     requires:
       #       - test
       #       - test_sca
+      #       - pr_test_secrets_scanning
+      #       - pr_test_sast
       #     filters:
       #       branches:
       #         only: staging
@@ -167,6 +273,8 @@ workflows:
       #     requires:
       #       - test
       #       - test_sca
+      #       - test_secrets_scanning
+      #       - test_sast
       #     filters:
       #       branches:
       #         only: master
@@ -174,6 +282,8 @@ workflows:
           requires:
             - test
             - test_sca
+            - pr_test_secrets_scanning
+            - pr_test_sast
           filters:
             branches:
               only: branch-1
