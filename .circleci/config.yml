@@ -244,9 +244,9 @@ workflows:
       - test_secrets_scanning:
           requires:
             - build
-        filters:
-          branches:
-            only: master
+          filters:
+            branches:
+              only: master
       - pr_test_secrets_scanning:
           requires:
             - build
