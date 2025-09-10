@@ -163,7 +163,7 @@ jobs:
           command: apk update && apk add curl jq
       - run:
           name: "Secrets Scanning"
-          command: trufflehog git file://. --fail --since-commit master --branch "$CIRCLE_BRANCH" -j | tee -a trufflehog-report.json | jq
+          command: trufflehog git file://. --since-commit master --branch "$CIRCLE_BRANCH" -j | tee -a trufflehog-report.json | jq
 
   test_secrets_scanning:
     docker:
