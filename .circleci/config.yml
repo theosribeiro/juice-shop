@@ -6,6 +6,7 @@ orbs:
   browser-tools: circleci/browser-tools@1.3.0
   aws-cli: circleci/aws-cli@3.1.4
   # synk: snyk/snyk@1.4.0
+  semgrep: returntocorp/semgrep@1.7.0
 
 jobs:
   build: 
@@ -105,20 +106,23 @@ jobs:
   # Configurar Semgrep para analizar somente as modificações em stand-alone mode
   #pr = pull request
   pr_test_sast:
-    environment:
-      SEMGREP_RULES: p/default
-      # Define a branch de base para comparar as modificações
-      SEMGREP_BASELINE_REF: origin/master
-      SEMGREP_SRC: .
+    # environment:
+    #   SEMGREP_RULES: p/default
+    #   # Define a branch de base para comparar as modificações
+    #   SEMGREP_BASELINE_REF: origin/master
+    #   SEMGREP_SRC: .
 
-    docker:
-      - image: returntocorp/semgrep
+    # docker:
+    #   - image: returntocorp/semgrep
+    executor: semgrep/default
     
     steps:
       - checkout
-      - run:
-          name: "Semgrep scan"
-          command: semgrep --config p/default --config semgrep-custom.yml
+      # - run:
+      #     name: "Semgrep scan"
+      #     command: semgrep --config p/default --config semgrep-custom.yml
+      - semgrep/scan:
+          config: "p/default semgrep-custom.yml"
   
   # Configurar Semgrep para enviar o resultado completo do scan para semgrep.dev
   # Executa analise estatica completa de codigo
