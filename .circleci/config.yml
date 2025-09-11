@@ -111,13 +111,13 @@ jobs:
       SEMGREP_BASELINE_REF: origin/master
 
     docker:
-      - image: semgrep/semgrep-agent:latest
+      - image: returntocorp/semgrep:latest
     
     steps:
       - checkout
       - run:
           name: "Semgrep scan"
-          command: semgrep --config p/default --config semgrep-custom.yml
+          command: semgrep ci --config semgrep-custom.yml
   
   # Configurar Semgrep para enviar o resultado completo do scan para semgrep.dev
   # Executa analise estatica completa de codigo
