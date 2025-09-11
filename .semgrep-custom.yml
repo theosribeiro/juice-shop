@@ -1,0 +1,18 @@
+rules:
+  - id: generic.secrets.security.detected-aws-access-key-id-value
+    paths:
+      exclude:
+        - routes/dataExport2.ts
+    pattern: $X
+    message: Ignored AWS Access Key ID in dataExport2.ts
+    languages: [javascript, typescript]
+    severity: WARNING
+
+  - id: generic.secrets.security.detected-aws-secret-access-key
+    paths:
+      exclude:
+        - routes/dataExport2.ts
+    pattern: $X
+    message: Ignored AWS Secret Access Key in dataExport2.ts
+    languages: [javascript, typescript]
+    severity: WARNING

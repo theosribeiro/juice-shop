@@ -1,0 +1,12 @@
+{
+    "AWSEBDockerrunVersion": "1",
+    "Image": {
+        "Name": "theosribeiro92/juice-shop:latest",
+        "Update": "true"
+    },
+    "Ports": [
+        {
+            "ContainerPort": "3000"
+        }
+    ]
+}

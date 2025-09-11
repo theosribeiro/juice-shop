@@ -120,11 +120,19 @@ describe('ChallengeSolvedNotificationComponent', () => {
   it('should store retrieved continue code as cookie for 1 year', () => {
     challengeService.continueCode.and.returnValue(of('12345'))
 
-    const expires = new Date()
+    const expectedDate = new Date()
+    expectedDate.setFullYear(expectedDate.getFullYear() + 1)
     component.saveProgress()
-    expires.setFullYear(expires.getFullYear() + 1)
 
-    expect(cookieService.put).toHaveBeenCalledWith('continueCode', '12345', { expires })
+    expect(cookieService.put).toHaveBeenCalled()
+    
+    // captura argumentos reais usados na chamada
+    const [key, value, options] = (cookieService.put as jasmine.Spy).calls.mostRecent().args
+
+    expect(key).toBe('continueCode')
+    expect(value).toBe('12345')
+    expect((options.expires as Date).getTime()).toBe(expectedDate.getTime())
+
   })
 
   it('should throw error when not supplied with a valid continue code', () => {
