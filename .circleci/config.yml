@@ -109,6 +109,7 @@ jobs:
       SEMGREP_RULES: p/default
       # Define a branch de base para comparar as modificações
       SEMGREP_BASELINE_REF: origin/master
+      SEMGREP_SRC: .
 
     docker:
       - image: returntocorp/semgrep
@@ -117,7 +118,7 @@ jobs:
       - checkout
       - run:
           name: "Semgrep scan"
-          command: semgrep --config p/default --config semgrep-custom.yml --src .
+          command: semgrep --config p/default --config semgrep-custom.yml
   
   # Configurar Semgrep para enviar o resultado completo do scan para semgrep.dev
   # Executa analise estatica completa de codigo
