@@ -109,10 +109,9 @@ jobs:
       SEMGREP_RULES: p/default
       # Define a branch de base para comparar as modificações
       SEMGREP_BASELINE_REF: origin/master
-      SEMGREP_SRC: /root/project
 
     docker:
-      - image: returntocorp/semgrep
+      - image: semgrep/semgrep-agent:latest
     
     steps:
       - checkout
