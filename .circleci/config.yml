@@ -130,7 +130,7 @@ jobs:
       REPORT_FILE: "semgrep-report.json"
 
     docker:
-      - image: returntocorp/semgrep
+      - image: returntocorp/semgrep:latest
 
     steps:
       - checkout
@@ -142,7 +142,7 @@ jobs:
           # Roda o semgrep falhando o pipeline caso encontre problemas
           # command: semgrep ci --json -o semgrep-report.json
           # Roda o semgrep sem falhar o pipeline caso encontre problemas
-          command: semgrep ci --json -o semgrep-report.json || true
+          command: semgrep ci --json -o semgrep-report.json --config semgrep-custom.yml || true
 
   # Executar o secets scanning no repotirorio considerando apenas as modificacoes pela branch atual
   pr_test_secrets_scanning:
