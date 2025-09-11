@@ -117,7 +117,7 @@ jobs:
       - checkout
       - run:
           name: "Semgrep scan"
-          command: semgrep --config p/default --config semgrep-custom.yml
+          command: semgrep --config p/default --config semgrep-custom.yml --src .
   
   # Configurar Semgrep para enviar o resultado completo do scan para semgrep.dev
   # Executa analise estatica completa de codigo
