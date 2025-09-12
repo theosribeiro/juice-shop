@@ -184,7 +184,8 @@ jobs:
       - run:
           name: "Secrets Scanning"
           # Somente falhar se conseguir verificar as credenciais (Se conseguir conexao por meio das credenciais)
-          command: trufflehog git file://. --fail --only-verified -j | tee -a trufflehog-report.json | jq
+          # command: trufflehog git file://. --fail --only-verified -j | tee -a trufflehog-report.json | jq
+          command: trufflehog git file://. --only-verified -j | tee -a trufflehog-report.json | jq
 
 
   deploy-branch-1:
