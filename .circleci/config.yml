@@ -414,7 +414,7 @@ workflows:
               only: master
       - pr_test_api_scan:
           requires:
-            - deploy-stg
+            - deploy-branch-1
           filters:
             branches:
               only: master

@@ -1,0 +1,221 @@
+openapi: 3.0.1
+info:
+  title: JUICESHOP API
+  description: Securing & Designing API endpoints based on API design security guidelines
+  contact:
+    email: teste@teste.com
+  version: 1.0.0
+  x-audience:
+  servers:  
+  - url: https://juice-shop-env-stg.eba.herokuapp.com
+  paths:
+    /api/Users:
+      put:
+        tags:
+          - UserRegistration
+        summary: Update user
+        description: Update user details
+        security:
+          - BearerAuth: []
+        OperationId: put-register
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginProperties'
+        resposnses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LoginProperties'
+          '400':
+            description: Bad Request
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_401'
+          '403':
+            description: Forbidden
+          '404':
+            description: Not Found
+          '500':
+            description: Internal Server Error
+        
+        post:
+          tags:
+            - UserRegistration
+          summary: Register user
+          description: "(SQL Injection or Data Exposure).\n Register a new user by Email and password"
+          security: 
+            - BearerAuth: []
+          operationId: register2
+          requestBody:
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/LoginProperties'
+          resposnses:
+            '201':
+              description: Created
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/LoginProperties'
+            '400':
+              description: Bad Request
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/inline_response_400'
+            '401':
+              description: Unauthorized
+              content:
+                application/json:
+                  schema:
+                    $ref: '#/components/schemas/inline_response_401'
+            '403':
+              description: Forbidden
+            '404':
+              description: Not Found
+            '500':
+              description: Internal Server Error
+
+    /api/Users/{userId}:
+      get:
+        tags:
+          - UserRegistration
+        summary: Get user Information
+        description: Get user details by userId
+        security:
+          - BearerAuth: []
+        operationId: getuserbyid
+        parameters:
+          - name: userId
+            in: path
+            description: ID of user to return
+            required: true
+            style: simple
+            explode: false
+            schema:
+              type: integer
+              format: int64
+        responses:
+          '201':
+            description: OK
+          '400':
+            description: Bad Request
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_401'
+          '403':
+            description: Forbidden
+          '404':
+            description: Not Found
+          '500':
+            description: Internal Server Error
+
+    /api/SecurityQuestions:
+      get:
+        summary: SecurityQuestions
+        description: Get all security questions
+        operationId: get-securityQuestions
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad Request
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_401'
+          '403':
+            description: Forbidden
+          '404':
+            description: Not Found
+          '500':
+            description: Internal Server Error
+    
+    /api/BasketItems:
+      post:
+        tags:
+          - Basket
+        summary: Add item to basket
+        description: Add an item to the basket
+        security:
+          - BearerAuth: []
+        operationId: itemstobasket
+        requestBody:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BasketItem'
+        responses:
+          '201':
+            description: Created
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/BasketItem'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_400'
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_401'
+          '403':
+            description: Forbidden
+          '404':
+            description: Not Found
+          '500':
+            description: Internal Server Error
+
+      get:
+        tags:
+          - Basket
+        summary: Get basket items
+        description: Get all items in the basket
+        security:
+          - BearerAuth: []
+        operationId: get-basketItems
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/BasketItem'
+          '400':
+            description: Bad Request
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_400'
+          '401':
+            description: Unauthorized
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/inline_response_401'
+          '403':
+            description: Forbidden
+          '404':
+            description: Not Found
+          '500':
+            description: Internal Server Error
