@@ -239,6 +239,9 @@ jobs:
 
     docker:
       - image: owasp/zap2docker-stable
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
     
     environment:
       APP_NAME: "Juice Shop"
