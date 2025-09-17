@@ -238,10 +238,7 @@ jobs:
   pr_test_dast:
 
     docker:
-      - image: owasp/zap2docker-stable
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
+      - image: ghcr.io/zaproxy/zaproxy:stable
     
     environment:
       APP_NAME: "Juice Shop"
