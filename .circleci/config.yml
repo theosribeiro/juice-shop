@@ -262,7 +262,7 @@ jobs:
   pr_test_api_scan:
 
     docker:
-      - image: owasp/zap2docker-stable
+      - image: ghcr.io/zaproxy/zaproxy:stable
     
     environment:
         APP_NAME: "Juice Shop"
