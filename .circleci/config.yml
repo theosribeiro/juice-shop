@@ -317,18 +317,19 @@ jobs:
           command: docker push $DOCKERHUB_USERNAME/juice-shop:latest
 
       # ATUALIZAR A APLICACAO NO AWS ELASTIC BEANSTALK
-      # - run:
-      #     name: "Instalar AWS CLI"
-      #     command: |
-      #       sudo apt-get update
-      #       sudo apt-get install -y awscli
-      # - run:
-      #     name: "Deploy no AWS Elastic Beanstalk"
-      #     command: |
-      #       aws configure set region sa-east-1
-      #       aws s3 cp ebs-app-options.json s3://juice-shop-tr-env-prod/ebs-app-options-$CIRCLE_SHA1.json
-      #       aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options-$CIRCLE_SHA1.json"
-      #       aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
+      - run:
+          name: "Instalar AWS CLI"
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
+      - run:
+          name: "Deploy no AWS Elastic Beanstalk"
+          command: |
+            aws configure set region sa-east-1
+            aws s3 cp ebs-app-options.json s3://juice-shop-tr-env-prod/ebs-app-options-$CIRCLE_SHA1.json
+            aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options-$CIRCLE_SHA1.json"
+            aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
+            ws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[].CNAME' >> ./.zap/env_stg.cname
 
 
 workflows:
