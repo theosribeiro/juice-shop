@@ -337,9 +337,9 @@ jobs:
     steps:
       - checkout
       - run: ls -la | grep terraform
-      - terraform/init:
-          path: ./terraform
-          extra_args: -reconfigure
+      - run:
+        name: Terraform Init
+        command: terraform init -reconfigure ./terraform
       - terraform/validate:
           path: ./terraform
       - terraform/fmt:
