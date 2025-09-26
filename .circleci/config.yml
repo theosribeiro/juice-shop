@@ -288,12 +288,75 @@ jobs:
             aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
             aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[].CNAME' >> ./.zap/env_stg.cname
   
+
+  deploy_stg:
+    
+    docker:
+      - image: cimg/base:2022.09
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+    environment:
+      EBS_ENV_NAME: "juice-shop-tr-ebs-stg"
+      EBS_APP_NAME: "juice-shop-tr-web-stg"
+      S3_BUCKET_NAME: "juice-shop-tr-s3-stg"
+      EBS_APP_OPTIONS_FILE: "ebs-app-options.json"
+
+    steps:
+      - setup_remote_docker:
+          version: 20.10.18
+      - attach_workspace:
+          at: .
+      - aws-cli/setup:
+          profile-name: default
+
+      # BUILD A IMAGEM DOCKER E PUBLICAR NO DOCKER HUB
+      - run:  
+          name: "Build e Push da imagem Docker no Docker Hub"
+          command: docker build -t $DOCKERHUB_USERNAME/juice-shop:$CIRCLE_SHA1 -t $DOCKERHUB_USERNAME/juice-shop:latest ./
+      - run: 
+          name: "Login no Docker Hub"
+          command: echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+      - run: 
+          name: "Push da imagem Docker no Docker Hub"
+          command: docker push $DOCKERHUB_USERNAME/juice-shop:$CIRCLE_SHA1
+      - run: 
+          name: "Push da imagem Docker com a tag latest no Docker Hub"
+          command: docker push $DOCKERHUB_USERNAME/juice-shop:latest
+      
+      # ATUALIZAR A APLICACAO NO AWS ELASTIC BEANSTALK
+      - run:
+          name: "Instalar AWS CLI"
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y awscli
+      - run:
+          name: "Deploy no AWS Elastic Beanstalk"
+          command: |
+            aws configure set region sa-east-1
+            aws s3 cp ./terraform/$EBS_APP_OPTIONS_FILE s3://$S3_BUCKET_NAME
+            aws elasticbeanstalk create-application-version --application-name $EBS_APP_NAME --version-label $CIRCLE_SHA1 --source-bundle S3Bucket=$S3_BUCKET_NAME,S3Key="$EBS_APP_OPTIONS_FILE"
+            aws elasticbeanstalk update-environment --environment-name $EBS_ENV_NAME --version-label $CIRCLE_SHA1
+            aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[].CNAME' >> ./.zap/env_stg.cname
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./*
+
+
   deploy-prod:
     docker:
       - image: cimg/base:2022.09
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
+
+    environment:
+      EBS_ENV_NAME: "juice-shop-tr-ebs-prod"
+      EBS_APP_NAME: "juice-shop-tr-web-prod"
+      S3_BUCKET_NAME: "juice-shop-tr-s3-prod"
+      EBS_APP_OPTIONS_FILE: "ebs-app-options.json"
+
     steps:
       - setup_remote_docker:
           docker_layer_caching: true
@@ -326,10 +389,10 @@ jobs:
           name: "Deploy no AWS Elastic Beanstalk"
           command: |
             aws configure set region sa-east-1
-            aws s3 cp ./terraform/ebs-app-options.json s3://juice-shop-tr-env-prod/ebs-app-options-$CIRCLE_SHA1.json
-            aws elasticbeanstalk create-application-version --application-name juice-shop-app-prod --version-label $CIRCLE_SHA1 --source-bundle S3Bucket="juice-shop-tr-env-prod",S3Key="ebs-app-options-$CIRCLE_SHA1.json"
-            aws elasticbeanstalk update-environment --environment-name juice-shop-env-prod --version-label $CIRCLE_SHA1
-            ws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[].CNAME' >> ./.zap/env_stg.cname
+            aws s3 cp ./terraform/$EBS_APP_OPTIONS_FILE s3://$S3_BUCKET_NAME
+            aws elasticbeanstalk create-application-version --application-name $EBS_APP_NAME --version-label $CIRCLE_SHA1 --source-bundle S3Bucket=$S3_BUCKET_NAME,S3Key="$EBS_APP_OPTIONS_FILE"
+            aws elasticbeanstalk update-environment --environment-name $EBS_ENV_NAME --version-label $CIRCLE_SHA1
+            aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[].CNAME' >> ./.zap/env_stg.cname
   
   # Deploy infra
   infrastructure_deploy:
@@ -418,6 +481,15 @@ workflows:
           filters:
             branches:
               ignore: master
+      - deploy_stg:
+          requires:
+            - test
+            - test_sca
+            - test_secrets_scanning
+            - test_sast
+          filters:
+            branches:
+              only: staging
       - deploy-prod:
           requires:
             - test
