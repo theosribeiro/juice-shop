@@ -339,7 +339,7 @@ jobs:
       - run: ls -la | grep terraform
       - run:
           name: Terraform Init
-          command: terraform init -reconfigure ./terraform
+          command: terraform -chdir=./terraform init -reconfigure
       - terraform/validate:
           path: ./terraform
       - terraform/fmt:
