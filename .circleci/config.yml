@@ -339,7 +339,7 @@ jobs:
       - run: ls -la | grep terraform
       - terraform/init:
           path: ./terraform
-          args: -reconfigure
+          extra_args: -reconfigure
       - terraform/validate:
           path: ./terraform
       - terraform/fmt:
