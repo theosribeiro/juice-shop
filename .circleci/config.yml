@@ -428,13 +428,13 @@ jobs:
       REPORT_FILE: "checkov/results_json.json"
 
     docker:
-      - image: python:3.9
+      - image: bridgecrew/checkov:latest
     
     steps:
       - checkout
-      - run: 
-          name: Install checkov
-          command: pip install checkov
+      # - run: 
+      #     name: Install checkov
+      #     command: pip install checkov
       - run:
           name: Scan Terraform with Checkov
           command: checkov -d ./terraform --framework terraform --soft-fail -o cli -o json --output-file-path console,$REPORT_FILE
