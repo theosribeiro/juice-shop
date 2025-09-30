@@ -542,7 +542,7 @@ workflows:
               only: terraform
       - infrastructure_deploy:
           requires:
-            - test_api_scan
+            - test_iac_scan
           filters:
             branches:
               only: terraform
