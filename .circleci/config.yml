@@ -7,6 +7,7 @@ orbs:
   aws-cli: circleci/aws-cli@3.1.4
   # synk: snyk/snyk@1.4.0
   terraform: circleci/terraform@3.2.1
+  checkov: bridgecrewio/checkov@0.0.4
 
 jobs:
   build: 
@@ -418,6 +419,25 @@ jobs:
           path: ./terraform
     
     working_directory: ~/src
+
+  test_iac_scan:
+    environment:
+      APP_NAME: "juice-shop"
+      DEFECT_DOJO_API_URL: "https//defectdojo.soulsec.net/api/v2/import-scan"
+      SCAN_TYPE: "Checkov Scan"
+      REPORT_FILE: "checkov/results_json.json"
+
+    docker:
+      - image: python:3.9
+    
+    steps:
+      - checkout
+      - run: 
+          name: Install checkov
+          command: pip install checkov
+      - run:
+          name: Scan Terraform with Checkov
+          command: checkov -d ./terraform --framework terraform --soft-fail -o cli -o json --output-file-path console,$REPORT_FILE
 
 
 workflows:
