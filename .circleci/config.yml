@@ -393,12 +393,13 @@ jobs:
             aws s3 cp ./terraform/$EBS_APP_OPTIONS_FILE s3://$S3_BUCKET_NAME
             aws elasticbeanstalk create-application-version --application-name $EBS_APP_NAME --version-label $CIRCLE_SHA1 --source-bundle S3Bucket=$S3_BUCKET_NAME,S3Key="$EBS_APP_OPTIONS_FILE"
             aws elasticbeanstalk update-environment --environment-name $EBS_ENV_NAME --version-label $CIRCLE_SHA1
-            CNAME = $(aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[]?.CNAME // empty')
-            if [ -z "$CNAME" ]; then
+            CNAME=$(aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[]?.CNAME // empty')
+            if [ -n "$CNAME" ]; then
               echo "$CNAME >> ./.zap/env_prod.cname"
               echo "CNAME encontrado: $CNAME"
             else 
               echo "Nenhum CNAME encontrado para o ambiente $EBS_ENV_NAME"
+            fi
   
   # Deploy infra
   infrastructure_deploy:
