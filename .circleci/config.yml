@@ -137,7 +137,6 @@ jobs:
       - image: returntocorp/semgrep:latest
     
     steps:
-      steps:
       - checkout
 
       - run:
@@ -309,7 +308,7 @@ jobs:
       
       - run:
           # -I -> nao falhar em warnings
-          command: zap-baseline.py -t "http://${cat /zap/wrk/.zap/env_stg.cname}" -I -x zap-baseline-scan-report -r baseline-report.html
+          command: zap-baseline.py -t "http://$(cat /zap/wrk/.zap/env_stg.cname)" -I -x zap-baseline-scan-report -r baseline-report.html
           no_output_timeout: 1.5h
 
       - run:
@@ -612,7 +611,7 @@ jobs:
             aws s3 cp ./terraform/$EBS_APP_OPTIONS_FILE s3://$S3_BUCKET_NAME
             aws elasticbeanstalk create-application-version --application-name $EBS_APP_NAME --version-label $CIRCLE_SHA1 --source-bundle S3Bucket=$S3_BUCKET_NAME,S3Key="$EBS_APP_OPTIONS_FILE"
             aws elasticbeanstalk update-environment --environment-name $EBS_ENV_NAME --version-label $CIRCLE_SHA1
-            CNAME=$(aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.environments[]?.CNAME // empty')
+            CNAME=$(aws elasticbeanstalk describe-environments --environment-name $EBS_ENV_NAME | jq -r '.Environments[]?.CNAME // empty')
             if [ -n "$CNAME" ]; then
               echo "$CNAME >> ./.zap/env_prod.cname"
               echo "CNAME encontrado: $CNAME"
@@ -643,7 +642,7 @@ jobs:
   test_iac_scan:
     environment:
       APP_NAME: "Produto Juice-shop"
-      DEFECT_DOJO_API_URL: "https//defectdojo.soulsec.net/api/v2/import-scan"
+      DEFECT_DOJO_API_URL: "https://defectdojo.soulsec.net/api/v2/import-scan"
       SCAN_TYPE: "Checkov Scan"
       REPORT_FILE: "checkov/results_json.json"
 
@@ -672,7 +671,7 @@ jobs:
             -F 'minimum_severity=Info' \
             -F "scan_date=$(date +%Y-%m-%d)" \
             -F "product_name=$APP_NAME" \
-            -F "file=@$REPORT_FILE;type=text/xml" \
+            -F "file=@$REPORT_FILE;type=application/json" \
             -F 'auto_create_context=TRUE' \
             -F "scan_type=$SCAN_TYPE"
 
